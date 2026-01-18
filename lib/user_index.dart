@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_user/user_detail.dart';
+import 'package:flutter_user/user_info.dart';
 
 class UserIndexPage extends StatefulWidget {
   UserIndexPage({Key? key}) : super(key: key);
@@ -108,123 +109,151 @@ class _UserIndexPageState extends State<UserIndexPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 120, 183, 236),
-                  Color.fromARGB(255, 169, 114, 179)
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 120, 183, 236),
+                    Color.fromARGB(255, 169, 114, 179),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
-            ),
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'User Profile Page',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-
-                // SearchBar
-                TextField(
-                  controller: searchController,
-                  onChanged: filterUsers,
-                  decoration: InputDecoration(
-                    hintText: 'Search by name or email...',
-                    prefixIcon: Icon(Icons.search),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.clear),
+              padding: const EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'User Profile Page',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.info),
                             onPressed: () {
-                              searchController.clear();
-                              filterUsers('');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const UserInfoPage(),
+                                  ));
                             },
                           )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
 
-                SizedBox(height: 20),
-
-                // Jumlah hasil pencarian
-                Text(
-                  'Found ${filteredUsers.length} user(s)',
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontSize: 14,
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 10,
-                ),
-
-                Expanded(
-                  child: filteredUsers.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.search_off,
-                                  size: 64, color: Colors.grey),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No users found',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                      // SearchBar
+                      TextField(
+                        controller: searchController,
+                        onChanged: filterUsers,
+                        decoration: InputDecoration(
+                          hintText: 'Search by name or email...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    searchController.clear();
+                                    filterUsers('');
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                        )
-                      : ListView.separated(
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.black,
-                                child: Image.asset(
-                                  'lib/assets/user.png',
-                                  width: 100,
-                                ),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Text(
+                        'Found ${filteredUsers.length} user(s)',
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 14,
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      filteredUsers.isEmpty
+                          ? const Center(
+                              child: Column(
+                                children: [
+                                  Icon(Icons.search_off,
+                                      size: 64, color: Colors.grey),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'No users found',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              title: Text(
-                                filteredUsers[index]['name']!,
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                            )
+                          : ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: filteredUsers.length,
+                              separatorBuilder: (_, __) => Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Colors.grey[300],
                               ),
-                              subtitle: Text(filteredUsers[index]['email']!),
-                              trailing: Icon(Icons.arrow_forward_ios),
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => UserDetailPage(
-                                              user: filteredUsers[index],
-                                            )));
+                              itemBuilder: (context, index) {
+                                final user = filteredUsers[index];
+                                return ListTile(
+                                  leading: const CircleAvatar(
+                                    backgroundColor: Colors.black,
+                                    child:
+                                        Icon(Icons.person, color: Colors.white),
+                                  ),
+                                  title: Text(
+                                    user['name']!,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  subtitle: Text(user['email']!),
+                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => UserDetailPage(
+                                          user: user,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               },
-                            );
-                          },
-                          separatorBuilder: (context, index) {
-                            return Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: Colors.grey[300],
-                            );
-                          },
-                          itemCount: filteredUsers.length),
-                )
-              ],
-            )),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
