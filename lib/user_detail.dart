@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 
-class UserDetailPage extends StatefulWidget {
+class UserDetailPage extends StatelessWidget {
   Map<String, String> user;
 
   UserDetailPage({super.key, required this.user});
 
-  @override
-  State<UserDetailPage> createState() => _UserDetailPageState();
-}
-
-class _UserDetailPageState extends State<UserDetailPage> {
   Widget _buildInfoCard(IconData icon, String label, String value) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -116,7 +111,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
                       ),
                       Center(
                         child: Text(
-                          widget.user['name']!,
+                          user['name']!,
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w500),
                         ),
@@ -132,22 +127,22 @@ class _UserDetailPageState extends State<UserDetailPage> {
                           _buildInfoCard(
                             Icons.alternate_email,
                             'Username',
-                            widget.user['username']!,
+                            user['username']!,
                           ),
                           _buildInfoCard(
                             Icons.email_outlined,
                             'Email',
-                            widget.user['email']!,
+                            user['email']!,
                           ),
                           _buildInfoCard(
                             Icons.phone_outlined,
-                            'No Telepon',
-                            widget.user['telp']!,
+                            'Phone number',
+                            user['telp']!,
                           ),
                           _buildInfoCard(
                             Icons.location_on_outlined,
-                            'Alamat',
-                            widget.user['alamat']!,
+                            'Address',
+                            user['alamat']!,
                           ),
                         ],
                       ),

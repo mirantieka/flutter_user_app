@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_user/user_create.dart';
 import 'package:flutter_user/user_detail.dart';
 import 'package:flutter_user/user_info.dart';
 
@@ -25,49 +26,60 @@ class _UserIndexPageState extends State<UserIndexPage> {
       'telp': '0811111111',
       'alamat': 'Jakarta, Indonesia',
     },
-    {
-      'name': 'Ahmad Dhani',
-      'email': 'ahmad@email.com',
-      'username': 'ahmdDan1',
-      'telp': '0811111111',
-      'alamat': 'Jakarta, Indonesia',
-    },
-    {
-      'name': 'Rina Wijaya',
-      'email': 'rina@email.com',
-      'username': 'rinawijayaa',
-      'telp': '0811111111',
-      'alamat': 'Jakarta, Indonesia',
-    },
-    {
-      'name': 'Joko Widodo',
-      'email': 'joko@email.com',
-      'username': 'widod0',
-      'telp': '0811111111',
-      'alamat': 'Jakarta, Indonesia',
-    },
-    {
-      'name': 'Dewi Lestari',
-      'email': 'dewi@email.com',
-      'username': 'delestari',
-      'telp': '0811111111',
-      'alamat': 'Jakarta, Indonesia',
-    },
-    {
-      'name': 'Andi Pratama',
-      'email': 'andi@email.com',
-      'username': 'prtamandi',
-      'telp': '0811111111',
-      'alamat': 'Jakarta, Indonesia',
-    },
-    {
-      'name': 'Maya Sari',
-      'email': 'maya@email.com',
-      'username': 'mayaa123',
-      'telp': '0811111111',
-      'alamat': 'Jakarta, Indonesia',
-    },
   ];
+
+  // Navigasi ke form dan terima data baru
+  void goToAddUserForm() async {
+    // Kirim list users ke form, tunggu hasil
+    final newUser = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserCreatePage(),
+      ),
+    );
+
+    // Jika ada data baru yang dikembalikan, tambahkan ke list
+    if (newUser != null) {
+      setState(() {
+        users.add(newUser);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('New User "${newUser['name']}" added successfuly!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  void deleteUser(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete confirmation'),
+        content: Text('Delete user ${users[index]['name']}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                users.removeAt(index);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('User deleted successfuly!')),
+              );
+            },
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
 
   // List yang sudah difilter
   List<Map<String, String>> filteredUsers = [];
@@ -198,13 +210,13 @@ class _UserIndexPageState extends State<UserIndexPage> {
                               child: Column(
                                 children: [
                                   Icon(Icons.search_off,
-                                      size: 64, color: Colors.grey),
+                                      size: 64, color: Colors.black),
                                   SizedBox(height: 16),
                                   Text(
                                     'No users found',
                                     style: TextStyle(
                                       fontSize: 18,
-                                      color: Colors.grey,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ],
@@ -233,7 +245,30 @@ class _UserIndexPageState extends State<UserIndexPage> {
                                         fontWeight: FontWeight.w600),
                                   ),
                                   subtitle: Text(user['email']!),
-                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.visibility,
+                                            color: Colors.grey[800]),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => UserDetailPage(
+                                              user: user,
+                                            ),
+                                          ),
+                                        ),
+                                        tooltip: 'Detail',
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete,
+                                            color: Colors.grey[800]),
+                                        onPressed: () => deleteUser(index),
+                                        tooltip: 'Delete',
+                                      ),
+                                    ],
+                                  ),
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -253,6 +288,11 @@ class _UserIndexPageState extends State<UserIndexPage> {
               ),
             );
           },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: goToAddUserForm,
+          child: Icon(Icons.add),
+          backgroundColor: Colors.yellow[100],
         ),
       ),
     );
